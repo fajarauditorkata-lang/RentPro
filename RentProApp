@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RENTPro - Heavy Equipment Rental & Workshop ERP SaaS</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Font Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col md:flex-row">
+
+    <!-- SIDEBAR NAV (Desktop & Mobile Responsive) -->
+    <aside class="w-full md:w-64 bg-slate-950 border-r border-slate-800 flex flex-col justify-between shrink-0">
+        <div>
+            <!-- Logo Header -->
+            <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-lg bg-amber-500 flex items-center justify-center font-bold text-slate-950 text-xl shadow-lg shadow-amber-500/20">
+                        RP
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-lg text-white leading-tight">RENTPro</h1>
+                        <span class="text-xs text-amber-400 font-medium">Enterprise SaaS ERP</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Tenant Indicator -->
+            <div class="mx-3 my-3 p-2.5 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-between">
+                <div class="truncate">
+                    <p class="text-xs text-slate-400">Tenant Aktif:</p>
+                    <p class="text-sm font-semibold text-slate-200 truncate" id="tenant-name">PT Nusantara Alat Berat</p>
+                </div>
+                <span class="px-2 py-0.5 text-[10px] bg-emerald-500/10 text-emerald-400 rounded border border-emerald-500/20 font-semibold">ACTIVE</span>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="p-2 space-y-1 text-sm font-medium">
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-amber-400 bg-amber-500/10 font-semibold transition">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                    <span>Dashboard KPI</span>
+                </button>
+                <button onclick="switchTab('equipment')" id="nav-equipment" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-900 hover:text-white transition">
+                    <i data-lucide="truck" class="w-5 h-5"></i>
+                    <span>Alat Berat (Assets)</span>
+                </button>
+                <button onclick="switchTab('contracts')" id="nav-contracts" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-900 hover:text-white transition">
+                    <i data-lucide="file-text" class="w-5 h-5"></i>
+                    <span>Kontrak Rental</span>
+                </button>
+                <button onclick="switchTab('hm')" id="nav-hm" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-900 hover:text-white transition">
+                    <i data-lucide="gauge" class="w-5 h-5"></i>
+                    <span>Hour Meter (HM)</span>
+                </button>
+                <button onclick="switchTab('workshop')" id="nav-workshop" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-900 hover:text-white transition">
+                    <i data-lucide="wrench" class="w-5 h-5"></i>
+                    <span>Workshop & WO</span>
+                </button>
+                <button onclick="switchTab('accounting')" id="nav-accounting" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-900 hover:text-white transition">
+                    <i data-lucide="calculator" class="w-5 h-5"></i>
+                    <span>Keuangan & Jurnal</span>
+                </button>
+                <button onclick="switchTab('guide')" id="nav-guide" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-indigo-400 hover:bg-indigo-900/20 transition border border-indigo-500/20 mt-4">
+                    <i data-lucide="git-branch" class="w-5 h-5"></i>
+                    <span>Panduan Deploy & Database</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- User Profile Footer -->
+        <div class="p-3 border-t border-slate-800 bg-slate-950">
+            <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center font-bold text-slate-300 text-xs">
+                    SA
+                </div>
+                <div class="truncate">
+                    <p class="text-xs font-semibold text-slate-200">Senior Software Architect</p>
+                    <p class="text-[10px] text-slate-400">admin@rentpro.id (Owner)</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-1 bg-slate-900 overflow-y-auto flex flex-col h-screen">
+
+        <!-- TOP BAR -->
+        <header class="h-14 border-b border-slate-800 bg-slate-950/50 backdrop-blur px-6 flex items-center justify-between shrink-0">
+            <div class="flex items-center space-x-2 text-xs text-slate-400">
+                <span>RENTPro SaaS</span>
+                <span>/</span>
+                <span id="breadcrumb-title" class="text-slate-200 font-semibold">Dashboard Utama</span>
+            </div>
+            <div class="flex items-center space-x-3">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-400 mr-1.5 animate-pulse"></span>
+                    Accrual Accounting Mode
+                </span>
+                <span class="text-xs text-slate-400">Asia/Jakarta (WIB)</span>
+            </div>
+        </header>
+
+        <!-- VIEW PANELS CONTAINER -->
+        <div class="p-6 flex-1 overflow-y-auto">
+
+            <!-- TAB 1: DASHBOARD -->
+            <div id="tab-dashboard" class="tab-content active space-y-6">
+                <!-- Top Summary Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="p-4 bg-slate-950 rounded-xl border border-slate-800 shadow-sm">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-xs text-slate-400">Total Unit Alat Berat</p>
+                                <h3 class="text-2xl font-bold text-white mt-1">24 Unit</h3>
+                            </div>
+                            <div class="p-2 bg-blue-500/10 text-blue-400 rounded-lg">
+                                <i data-lucide="truck" class="w-5 h-5"></i>
+                            </div>
+                        </div>
+                        <div class="mt-3 flex items-center space-x-2 text-xs">
+                            <span class="text-emerald-400 font-medium">18 Available</span>
+                            <span class="text-slate-600">•</span>
+                            <span class="text-amber-400 font-medium">4 Rented</span>
+                            <span class="text-slate-600">•</span>
+                            <span class="text-rose-400 font-medium">2 Maintenance</span>
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-slate-950 rounded-xl border border-slate-800 shadow-sm">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-xs text-slate-400">Pendapatan Rental (Bulan Ini)</p>
+                                <h3 class="text-2xl font-bold text-emerald-400 mt-1">Rp 485.000.000</h3>
+                            </div>
+                            <div class="p-2 bg-emerald-500/10 text-emerald-400 rounded-lg">
+                                <i data-lucide="trending-up" class="w-5 h-5"></i>
+                            </div>
+                        </div>
+                        <p class="mt-3 text-xs text-slate-400">
+                            <span class="text-emerald-400">↑ 12.5%</span> dibanding bulan lalu
+                        </p>
+                    </div>
+
+                    <div class="p-4 bg-slate-950 rounded-xl border border-slate-800 shadow-sm">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-xs text-slate-400">Total Piutang Usaha (AR)</p>
+                                <h3 class="text-2xl font-bold text-amber-400 mt-1">Rp 165.500.000</h3>
+                            </div>
+                            <div class="p-2 bg-amber-500/10 text-amber-400 rounded-lg">
+                                <i data-lucide="receipt" class="w-5 h-5"></i>
+                            </div>
+                        </div>
+                        <p class="mt-3 text-xs text-slate-400">3 Invoice jatuh tempo minggu ini</p>
+                    </div>
+
+                    <div class="p-4 bg-slate-950 rounded-xl border border-slate-800 shadow-sm">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-xs text-slate-400">Utilisasi Armada</p>
+                                <h3 class="text-2xl font-bold text-indigo-400 mt-1">83.3%</h3>
+                            </div>
+                            <div class="p-2 bg-indigo-500/10 text-indigo-400 rounded-lg">
+                                <i data-lucide="activity" class="w-5 h-5"></i>
+                            </div>
+                        </div>
+                        <p class="mt-3 text-xs text-slate-400">Target minimal 75% tercapai</p>
+                    </div>
+                </div>
+
+                <!-- Recent Activities & Live Fleet Monitoring -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 bg-slate-950 rounded-xl border border-slate-800 p-5">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-semibold text-white">Status Operational Real-Time Unit</h3>
+                            <span class="text-xs text-slate-400">Terhubung Supabase Postgres</span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs text-slate-300">
+                                <thead class="bg-slate-900 text-slate-400 font-semibold border-b border-slate-800">
+                                    <tr>
+                                        <th class="p-2.5">No. Unit</th>
+                                        <th class="p-2.5">Nama Alat / Model</th>
+                                        <th class="p-2.5">Lokasi Proyek</th>
+                                        <th class="p-2.5">HM Terakhir</th>
+                                        <th class="p-2.5">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-800/50">
+                                    <tr>
+                                        <td class="p-2.5 font-bold text-amber-400">EXC-200-01</td>
+                                        <td class="p-2.5">Komatsu PC200-8</td>
+                                        <td class="p-2.5">Proyek Tambang Nikel Morowali</td>
+                                        <td class="p-2.5">4.250 HM</td>
+                                        <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">RENTED</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-2.5 font-bold text-amber-400">BLL-D65-02</td>
+                                        <td class="p-2.5">CAT D6R Bulldozer</td>
+                                        <td class="p-2.5">Proyek Tol Balikpapan</td>
+                                        <td class="p-2.5">6.120 HM</td>
+                                        <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">RESERVED</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-2.5 font-bold text-amber-400">EXC-300-05</td>
+                                        <td class="p-2.5">Hitachi ZX330-5G</td>
+                                        <td class="p-2.5">Workshop Utama Jakarta</td>
+                                        <td class="p-2.5">8.940 HM</td>
+                                        <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20">BREAKDOWN</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-2.5 font-bold text-amber-400">WLD-WA380-01</td>
+                                        <td class="p-2.5">Wheel Loader WA380</td>
+                                        <td class="p-2.5">Pool Cabang Surabaya</td>
+                                        <td class="p-2.5">3.100 HM</td>
+                                        <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">AVAILABLE</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Alert Notifications -->
+                    <div class="bg-slate-950 rounded-xl border border-slate-800 p-5 space-y-4">
+                        <h3 class="font-semibold text-white">Notifikasi Sistem & Warning</h3>
+                        <div class="space-y-3">
+                            <div class="p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg text-xs space-y-1">
+                                <div class="flex justify-between font-semibold text-amber-400">
+                                    <span>Jadwal PM (Preventive)</span>
+                                    <span>2 Hari Lagi</span>
+                                </div>
+                                <p class="text-slate-300">EXC-200-01 mendekati interval 250 Jam (Servis Olip & Filter).</p>
+                            </div>
+                            <div class="p-3 bg-rose-500/10 border border-rose-500/20 rounded-lg text-xs space-y-1">
+                                <div class="flex justify-between font-semibold text-rose-400">
+                                    <span>Invoice Overdue</span>
+                                    <span>Rp 45.000.000</span>
+                                </div>
+                                <p class="text-slate-300">PT Kalimantan Mining - Inv #INV-2026-088 lewat 5 hari.</p>
+                            </div>
+                            <div class="p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-lg text-xs space-y-1">
+                                <div class="flex justify-between font-semibold text-indigo-400">
+                                    <span>Stok Minimum Sparepart</span>
+                                    <span>Gudang Utama</span>
+                                </div>
+                                <p class="text-slate-300">Filter Oli Hydro (P/N: 421-60-35170) sisa 2 Pcs (Min: 5 Pcs).</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: EQUIPMENT MANAGEMENT -->
+            <div id="tab-equipment" class="tab-content space-y-6">
+                <div class="flex justify-between items-center bg-slate-950 p-4 rounded-xl border border-slate-800">
+                    <div>
+                        <h2 class="text-lg font-bold text-white">Master Data Alat Berat</h2>
+                        <p class="text-xs text-slate-400">Kelola informasi spesifikasi, kepemilikan, dan biaya operasional unit alat berat.</p>
+                    </div>
+                    <button class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs rounded-lg flex items-center space-x-2 transition">
+                        <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                        <span>Tambah Unit Baru</span>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- Unit Card 1 -->
+                    <div class="bg-slate-950 rounded-xl border border-slate-800 p-4 space-y-3">
+                        <div class="flex justify-between items-start">
+                            <span class="text-xs font-bold px-2 py-1 bg-slate-900 text-amber-400 border border-slate-800 rounded">EXC-200-01</span>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">RENTED</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-white text-base">Komatsu PC200-8</h4>
+                            <p class="text-xs text-slate-400">Excavator 20 Ton • S/N: KMT200-987412</p>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-slate-800 text-slate-300">
+                            <div>
+                                <span class="text-slate-500 block">HM Saat Ini:</span>
+                                <span class="font-semibold text-white">4.250 HM</span>
+                            </div>
+                            <div>
+                                <span class="text-slate-500 block">Tarif Rent/Jam:</span>
+                                <span class="font-semibold text-white">Rp 275.000</span>
+                            </div>
+                        </div>
+                        <div class="pt-2 flex space-x-2">
+                            <button class="flex-1 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs rounded border border-slate-800 font-medium">Detail Unit</button>
+                            <button class="flex-1 py-1.5 bg-slate-900 hover:bg-slate-800 text-amber-400 text-xs rounded border border-slate-800 font-medium">Riwayat HM</button>
+                        </div>
+                    </div>
+
+                    <!-- Unit Card 2 -->
+                    <div class="bg-slate-950 rounded-xl border border-slate-800 p-4 space-y-3">
+                        <div class="flex justify-between items-start">
+                            <span class="text-xs font-bold px-2 py-1 bg-slate-900 text-amber-400 border border-slate-800 rounded">BLL-D65-02</span>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">RESERVED</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-white text-base">Caterpillar D6R</h4>
+                            <p class="text-xs text-slate-400">Bulldozer • S/N: CAT0D6R-55412</p>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-slate-800 text-slate-300">
+                            <div>
+                                <span class="text-slate-500 block">HM Saat Ini:</span>
+                                <span class="font-semibold text-white">6.120 HM</span>
+                            </div>
+                            <div>
+                                <span class="text-slate-500 block">Tarif Rent/Jam:</span>
+                                <span class="font-semibold text-white">Rp 350.000</span>
+                            </div>
+                        </div>
+                        <div class="pt-2 flex space-x-2">
+                            <button class="flex-1 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs rounded border border-slate-800 font-medium">Detail Unit</button>
+                            <button class="flex-1 py-1.5 bg-slate-900 hover:bg-slate-800 text-amber-400 text-xs rounded border border-slate-800 font-medium">Riwayat HM</button>
+                        </div>
+                    </div>
+
+                    <!-- Unit Card 3 -->
+                    <div class="bg-slate-950 rounded-xl border border-slate-800 p-4 space-y-3">
+                        <div class="flex justify-between items-start">
+                            <span class="text-xs font-bold px-2 py-1 bg-slate-900 text-amber-400 border border-slate-800 rounded">EXC-300-05</span>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20">BREAKDOWN</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-white text-base">Hitachi ZX330-5G</h4>
+                            <p class="text-xs text-slate-400">Excavator 33 Ton • S/N: HTC330-11203</p>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-slate-800 text-slate-300">
+                            <div>
+                                <span class="text-slate-500 block">HM Saat Ini:</span>
+                                <span class="font-semibold text-white">8.940 HM</span>
+                            </div>
+                            <div>
+                                <span class="text-slate-500 block">Tarif Rent/Jam:</span>
+                                <span class="font-semibold text-white">Rp 420.000</span>
+                            </div>
+                        </div>
+                        <div class="pt-2 flex space-x-2">
+                            <button class="flex-1 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs rounded border border-slate-800 font-medium">Detail Unit</button>
+                            <button class="flex-1 py-1.5 bg-slate-900 hover:bg-slate-800 text-amber-400 text-xs rounded border border-slate-800 font-medium">Work Order</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: CONTRACTS -->
+            <div id="tab-contracts" class="tab-content space-y-6">
+                <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-bold text-white">Manajemen Kontrak Rental</h3>
+                        <button class="px-3 py-1.5 bg-amber-500 text-slate-950 text-xs font-bold rounded-lg flex items-center space-x-1">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            <span>Buat Kontrak Baru</span>
+                        </button>
+                    </div>
+
+                    <div class="border border-slate-800 rounded-lg overflow-hidden">
+                        <table class="w-full text-left text-xs text-slate-300">
+                            <thead class="bg-slate-900 text-slate-400 font-semibold">
+                                <tr>
+                                    <th class="p-3">No. Kontrak</th>
+                                    <th class="p-3">Pelanggan / Perusahaan</th>
+                                    <th class="p-3">Unit Sewa</th>
+                                    <th class="p-3">Min. Jam / Bulan</th>
+                                    <th class="p-3">Periode</th>
+                                    <th class="p-3">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800">
+                                <tr>
+                                    <td class="p-3 font-mono text-amber-400">CTR/2026/02/001</td>
+                                    <td class="p-3 font-medium text-white">PT Mandiri Pertambangan Nikel</td>
+                                    <td class="p-3">EXC-200-01 (Komatsu PC200)</td>
+                                    <td class="p-3">200 HM / Bln</td>
+                                    <td class="p-3">01-Feb-2026 s/d 31-Juli-2026</td>
+                                    <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">ACTIVE</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-mono text-amber-400">CTR/2026/01/014</td>
+                                    <td class="p-3 font-medium text-white">PT Nusantara Konstruksi Utama</td>
+                                    <td class="p-3">BLL-D65-02 (CAT D6R)</td>
+                                    <td class="p-3">150 HM / Bln</td>
+                                    <td class="p-3">15-Jan-2026 s/d 15-Apr-2026</td>
+                                    <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">ACTIVE</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: HOUR METER (HM) -->
+            <div id="tab-hm" class="tab-content space-y-6">
+                <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-4">
+                    <h3 class="font-bold text-white">Simulasi Catat Hour Meter (HM) Harian</h3>
+                    <p class="text-xs text-slate-400">Sistem memvalidasi bahwa HM Akhir tidak boleh mundur dari HM Awal (Terintegrasi Supabase Validator).</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-slate-900 rounded-lg border border-slate-800">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Pilih Unit Alat</label>
+                            <select class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-xs text-white">
+                                <option>EXC-200-01 - Komatsu PC200</option>
+                                <option>BLL-D65-02 - CAT D6R</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">HM Awal</label>
+                            <input type="number" value="4250" readonly class="w-full bg-slate-800 border border-slate-700 rounded px-3 py-2 text-xs text-slate-400">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">HM Akhir Hari Ini</label>
+                            <input type="number" id="hm-akhir-input" value="4258" oninput="calculateHM()" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-xs text-white focus:border-amber-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">HM Aktual Digunakan</label>
+                            <div class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-xs font-bold text-amber-400" id="hm-aktual-result">
+                                8.0 Jam
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex justify-end">
+                        <button onclick="alert('Data HM berhasil tervalidasi dan tersimpan di database Postgres!')" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold text-xs rounded-lg transition">Simpan Catatan HM</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 5: WORKSHOP & WO -->
+            <div id="tab-workshop" class="tab-content space-y-6">
+                <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-bold text-white">Daftar Work Order Maintenance & Perbaikan</h3>
+                        <button class="px-3 py-1.5 bg-amber-500 text-slate-950 text-xs font-bold rounded-lg">Buat Work Order</button>
+                    </div>
+
+                    <div class="border border-slate-800 rounded-lg overflow-hidden text-xs">
+                        <table class="w-full text-left text-slate-300">
+                            <thead class="bg-slate-900 text-slate-400">
+                                <tr>
+                                    <th class="p-3">No. WO</th>
+                                    <th class="p-3">Unit</th>
+                                    <th class="p-3">Jenis Pekerjaan</th>
+                                    <th class="p-3">Mekanik Lead</th>
+                                    <th class="p-3">Estimasi Biaya</th>
+                                    <th class="p-3">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800">
+                                <tr>
+                                    <td class="p-3 font-mono text-amber-400">WO/2026/02/089</td>
+                                    <td class="p-3">EXC-300-05</td>
+                                    <td class="p-3">Overhaul Main Hydraulic Pump</td>
+                                    <td class="p-3">Budi Santoso (Sr. Mechanic)</td>
+                                    <td class="p-3 font-semibold text-white">Rp 28.500.000</td>
+                                    <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20">IN PROGRESS</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 6: ACCOUNTING -->
+            <div id="tab-accounting" class="tab-content space-y-6">
+                <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-4">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 class="font-bold text-white">General Ledger & Double-Entry Journal</h3>
+                            <p class="text-xs text-slate-400">Prinsip Akuntansi Accrual: Total Debit WAJIB Sama Dengan Total Kredit.</p>
+                        </div>
+                        <span class="px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-mono text-xs rounded font-bold">BALANCED JOURNAL</span>
+                    </div>
+
+                    <div class="border border-slate-800 rounded-lg overflow-hidden text-xs">
+                        <table class="w-full text-left text-slate-300">
+                            <thead class="bg-slate-900 text-slate-400 font-semibold">
+                                <tr>
+                                    <th class="p-3">No. Jurnal</th>
+                                    <th class="p-3">Kode Akun (COA)</th>
+                                    <th class="p-3">Keterangan Transaksi</th>
+                                    <th class="p-3 text-right">Debit (IDR)</th>
+                                    <th class="p-3 text-right">Kredit (IDR)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800 font-mono">
+                                <tr>
+                                    <td class="p-3 text-slate-400">JRN-2026-001</td>
+                                    <td class="p-3 text-amber-400">1120-001 (Piutang Usaha)</td>
+                                    <td class="p-3 font-sans text-slate-200">Tagihan Rental PT Mandiri Mining</td>
+                                    <td class="p-3 text-right text-emerald-400">55.000.000</td>
+                                    <td class="p-3 text-right text-slate-500">0</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 text-slate-400">JRN-2026-001</td>
+                                    <td class="p-3 text-amber-400">4110-001 (Pendapatan Sewa Alat)</td>
+                                    <td class="p-3 font-sans text-slate-200">Pengakuan Pendapatan Sewa Exca</td>
+                                    <td class="p-3 text-right text-slate-500">0</td>
+                                    <td class="p-3 text-right text-emerald-400">55.000.000</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 7: DEPLOYMENT & DATABASE GUIDE -->
+            <div id="tab-guide" class="tab-content space-y-6">
+                <div class="bg-slate-950 p-6 rounded-xl border border-slate-800 space-y-6">
+                    <div>
+                        <h2 class="text-xl font-bold text-white flex items-center space-x-2">
+                            <i data-lucide="book-open" class="text-amber-400"></i>
+                            <span>Panduan Lengkap Pembangunan & Deploy RENTPro</span>
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-1">Langkah teknis mengintegrasikan Web Application ini dengan GitHub dan Supabase PostgreSQL.</p>
+                    </div>
+
+                    <!-- Step 1: GitHub Repository Setup -->
+                    <div class="space-y-2 border-l-2 border-amber-500 pl-4">
+                        <h3 class="font-bold text-amber-400 text-sm">Langkah 1: Setup Repository GitHub</h3>
+                        <p class="text-xs text-slate-300">Inisialisasi repositori Next.js 14 App Router dan dorong kode ke GitHub:</p>
+                        <pre class="bg-slate-900 p-3 rounded text-[11px] font-mono text-slate-300 overflow-x-auto">npx create-next-app@latest rentpro --typescript --tailwind --eslint
+cd rentpro
+git init
+git add .
+git commit -m "feat: Initial RENTPro SaaS Setup"
+git remote add origin https://github.com/USERNAME/rentpro-saas.git
+git branch -M main
+git push -u origin main</pre>
+                    </div>
+
+                    <!-- Step 2: Supabase Environment Setup -->
+                    <div class="space-y-2 border-l-2 border-indigo-500 pl-4">
+                        <h3 class="font-bold text-indigo-400 text-sm">Langkah 2: Konfigurasi Environment Variables (.env.local)</h3>
+                        <p class="text-xs text-slate-300">Buat file `.env.local` pada akar proyek Next.js Anda:</p>
+                        <pre class="bg-slate-900 p-3 rounded text-[11px] font-mono text-emerald-400 overflow-x-auto">NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9... # (Hanya di server side!)</pre>
+                    </div>
+
+                    <!-- Step 3: Run Database Migrations -->
+                    <div class="space-y-2 border-l-2 border-emerald-500 pl-4">
+                        <h3 class="font-bold text-emerald-400 text-sm">Langkah 3: Jalankan SQL Migration di Supabase SQL Editor</h3>
+                        <p class="text-xs text-slate-300">Salin skema RLS PostgreSQL di bawah ini ke editor Supabase Anda untuk mengaktifkan isolasi data multi-tenant:</p>
+                        <pre class="bg-slate-900 p-3 rounded text-[11px] font-mono text-slate-300 overflow-x-auto max-h-48">-- Multi-Tenant Helper & Core RLS
+CREATE OR REPLACE FUNCTION get_current_tenant_id()
+RETURNS UUID AS $$
+  SELECT tenant_id FROM profiles WHERE id = auth.uid();
+$$ LANGUAGE sql SECURITY DEFINER;
+
+-- Enable Row Level Security (RLS) pada tabel bisnis
+ALTER TABLE equipment ENABLE ROW LEVEL SECURITY;
+CREATE POLICY tenant_equipment_isolation ON equipment
+  FOR ALL USING (tenant_id = get_current_tenant_id());</pre>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- INTERACTIVE JAVASCRIPT LOGIC -->
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Navigation Tab Switcher Function
+        function switchTab(tabId) {
+            // Hide all tab contents
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(el => el.classList.remove('active'));
+
+            // Reset navigation styles
+            const navButtons = document.querySelectorAll('nav button');
+            navButtons.forEach(btn => {
+                btn.classList.remove('text-amber-400', 'bg-amber-500/10', 'font-semibold');
+                btn.classList.add('text-slate-400');
+            });
+
+            // Activate target tab content
+            const targetTab = document.getElementById('tab-' + tabId);
+            if (targetTab) {
+                targetTab.classList.add('active');
+            }
+
+            // Highlight active navigation button
+            const activeNav = document.getElementById('nav-' + tabId);
+            if (activeNav) {
+                activeNav.classList.remove('text-slate-400');
+                activeNav.classList.add('text-amber-400', 'bg-amber-500/10', 'font-semibold');
+            }
+
+            // Update Breadcrumb Header
+            const breadcrumb = document.getElementById('breadcrumb-title');
+            const titles = {
+                'dashboard': 'Dashboard KPI Utama',
+                'equipment': 'Master Data Alat Berat (Fleet Management)',
+                'contracts': 'Manajemen Kontrak Rental Alat Berat',
+                'hm': 'Monitoring Hour Meter (HM) Harian',
+                'workshop': 'Work Order & Maintenance Workshop',
+                'accounting': 'Akuntansi Accrual & Jurnal Double-Entry',
+                'guide': 'Panduan GitHub & Supabase Integration'
+            };
+            if (breadcrumb && titles[tabId]) {
+                breadcrumb.textContent = titles[tabId];
+            }
+        }
+
+        // Real-Time Hour Meter Calculation Logic
+        function calculateHM() {
+            const hmAwal = 4250;
+            const hmAkhirInput = document.getElementById('hm-akhir-input');
+            const hmResult = document.getElementById('hm-aktual-result');
+
+            let hmAkhir = parseFloat(hmAkhirInput.value) || 0;
+
+            if (hmAkhir < hmAwal) {
+                hmResult.textContent = 'ERROR: HM Mundur!';
+                hmResult.className = 'w-full bg-rose-950 border border-rose-800 rounded px-3 py-2 text-xs font-bold text-rose-400';
+            } else {
+                const diff = (hmAkhir - hmAwal).toFixed(1);
+                hmResult.textContent = `${diff} Jam`;
+                hmResult.className = 'w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-xs font-bold text-amber-400';
+            }
+        }
+    </script>
+</body>
+</html>
